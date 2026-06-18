@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acervo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=Newsreader:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ===== NAV ===== -->
+  <header class="nav">
+    <div class="nav-mark">
+      <span class="nav-mark-glyph">⟐</span>
+      <span class="nav-mark-text">Acervo</span>
+    </div>
+    <nav class="nav-links">
+      <button class="nav-link is-active" data-route="timeline">Timeline</button>
+      <button class="nav-link" data-route="search">Buscar</button>
+      <button class="nav-link" data-route="profile">Perfil</button>
+    </nav>
+  </header>
+
+  <!-- ===== TIMELINE / HOME ===== -->
+  <main class="screen is-active" data-screen="timeline">
+
+    <section class="composer" aria-label="Adicionar item ao acervo">
+      <div class="composer-tabs" role="tablist">
+        <button class="composer-tab is-active" data-mode="file" role="tab">Arquivo</button>
+        <button class="composer-tab" data-mode="link" role="tab">Link</button>
+        <button class="composer-tab" data-mode="text" role="tab">Texto</button>
+      </div>
+
+      <div class="composer-body">
+
+        <!-- file mode -->
+        <div class="composer-pane is-active" data-pane="file">
+          <label class="dropzone" id="dropzone" for="file-input">
+            <span class="dropzone-glyph">+</span>
+            <span class="dropzone-label">Solte um arquivo aqui ou clique para anexar</span>
+            <span class="dropzone-sub">imagem, áudio, vídeo ou documento — arquivos grandes de vídeo/áudio, prefira a aba “Link”</span>
+            <input type="file" id="file-input" hidden>
+          </label>
+          <div class="file-preview" id="file-preview" hidden></div>
+        </div>
+
+        <!-- link mode -->
+        <div class="composer-pane" data-pane="link">
+          <label class="field-label" for="link-input">URL de referência</label>
+          <input type="url" id="link-input" class="text-input" placeholder="https://...">
+          <label class="field-label" for="link-title-input">Título <span class="field-optional">(opcional)</span></label>
+          <input type="text" id="link-title-input" class="text-input" placeholder="Como esse link deve aparecer no acervo">
+        </div>
+
+        <!-- text mode -->
+        <div class="composer-pane" data-pane="text">
+          <label class="field-label" for="text-title-input">Título <span class="field-optional">(opcional)</span></label>
+          <input type="text" id="text-title-input" class="text-input" placeholder="Sem título">
+          <label class="field-label" for="text-body-input">Texto</label>
+          <textarea id="text-body-input" class="text-input text-area" placeholder="Escreva ou cole um poema, anotação, trecho de artigo..." rows="6"></textarea>
+        </div>
+
+        <div class="composer-footer">
+          <div class="tag-input-wrap">
+            <label class="field-label" for="tag-input">Tags</label>
+            <div class="tag-input" id="tag-input-shell">
+              <input type="text" id="tag-input" placeholder="adicionar tag e pressionar Enter">
+            </div>
+          </div>
+          <button class="btn btn-primary" id="submit-entry" disabled>Adicionar ao acervo</button>
+        </div>
+        <p class="composer-error" id="composer-error" hidden></p>
+      </div>
+    </section>
+
+    <section class="timeline-controls">
+      <span class="field-label group-label">Agrupar por</span>
+      <div class="segmented" id="grouping-control">
+        <button class="segmented-opt is-active" data-group="month">Mês</button>
+        <button class="segmented-opt" data-group="year">Ano</button>
+        <button class="segmented-opt" data-group="semester">Semestre</button>
+        <button class="segmented-opt" data-group="week">Semana</button>
+        <button class="segmented-opt" data-group="day">Dia</button>
+      </div>
+      <span class="item-count" id="item-count"></span>
+    </section>
+
+    <section class="timeline" id="timeline-root">
+      <!-- groups rendered here -->
+    </section>
+
+    <div class="empty-state" id="timeline-empty" hidden>
+      <p class="empty-title">O acervo está vazio</p>
+      <p class="empty-sub">Anexe uma imagem, cole um link ou escreva um texto acima para começar.</p>
+    </div>
+  </main>
+
+  <!-- ===== SEARCH ===== -->
+  <main class="screen" data-screen="search">
+    <section class="search-panel">
+      <label class="field-label" for="search-tag-input">Buscar por tags</label>
+      <div class="tag-input" id="search-tag-input-shell">
+        <input type="text" id="search-tag-input" placeholder="digite uma tag...">
+      </div>
+      <div class="tag-suggestions" id="tag-suggestions"></div>
+    </section>
+    <section class="timeline" id="search-results-root"></section>
+    <div class="empty-state" id="search-empty">
+      <p class="empty-title">Escolha uma ou mais tags</p>
+      <p class="empty-sub">Os itens que contiverem todas as tags selecionadas aparecem aqui.</p>
+    </div>
+  </main>
+
+  <!-- ===== PROFILE ===== -->
+  <main class="screen" data-screen="profile">
+    <section class="profile-grid">
+
+      <div class="profile-card">
+        <h2 class="profile-h">Perfil</h2>
+        <div class="avatar-row">
+          <label class="avatar-upload" id="avatar-upload" for="avatar-input">
+            <img id="avatar-img" hidden>
+            <span id="avatar-placeholder">+</span>
+            <input type="file" id="avatar-input" accept="image/*" hidden>
+          </label>
+          <div class="avatar-fields">
+            <label class="field-label" for="profile-name">Nome</label>
+            <input type="text" id="profile-name" class="text-input" placeholder="Seu nome">
+            <label class="field-label" for="profile-bio">Bio</label>
+            <textarea id="profile-bio" class="text-input text-area" rows="3" placeholder="Uma linha sobre você ou sobre este acervo"></textarea>
+          </div>
+        </div>
+        <button class="btn btn-secondary" id="save-profile">Salvar perfil</button>
+      </div>
+
+      <div class="profile-card">
+        <h2 class="profile-h">Preferências</h2>
+        <label class="field-label" for="default-grouping">Agrupamento padrão da timeline</label>
+        <select id="default-grouping" class="text-input">
+          <option value="month">Mês</option>
+          <option value="year">Ano</option>
+          <option value="semester">Semestre</option>
+          <option value="week">Semana</option>
+          <option value="day">Dia</option>
+        </select>
+      </div>
+
+      <div class="profile-card">
+        <h2 class="profile-h">Estatísticas</h2>
+        <div class="stats-grid" id="stats-grid"></div>
+      </div>
+
+      <div class="profile-card">
+        <h2 class="profile-h">Dados</h2>
+        <p class="profile-note">Tudo é armazenado localmente neste navegador. Exporte um backup regularmente, sobretudo antes de limpar dados do navegador ou trocar de dispositivo.</p>
+        <div class="data-actions">
+          <button class="btn btn-secondary" id="export-data">Exportar backup (.json)</button>
+          <label class="btn btn-secondary" for="import-data-input">Importar backup</label>
+          <input type="file" id="import-data-input" accept="application/json" hidden>
+          <button class="btn btn-danger" id="clear-data">Limpar todos os dados</button>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+</div>
+
+<!-- ===== ITEM DETAIL MODAL ===== -->
+<div class="modal-overlay" id="modal-overlay" hidden>
+  <div class="modal" id="modal" role="dialog" aria-modal="true"></div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script type="module" src="db.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>
